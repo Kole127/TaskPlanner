@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  :root {
+    @apply  bg-gradient-to-r from-slate-900 to-slate-950 text-slate-300;
+  }
+  input {
+    @apply block bg-slate-800 text-slate-50 rounded-lg w-full p-2 text-sm focus:ring-slate-700 focus:border-slate-700 dark:[color-scheme:dark];
+  }
+  label {
+    @apply block mb-2;
+  }
+  dialog {
+    @apply p-5 rounded flex flex-col text-center w-1/3 bg-slate-300;
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply flex items-center p-2 text-slate-900 rounded-lg dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700;
+  }
+  .btn {
+    @apply bg-slate-700 text-slate-50 px-3 py-1 rounded cursor-pointer hover:text-slate-700 hover:bg-slate-50;
+  }
+}
+
+@layer utilities {
+  /* Act as a border */
+  .card-wrapper {
+    @apply relative overflow-hidden rounded-2xl bg-gradient-to-b from-slate-700 to-slate-800;
+  }
+
+  /* Gradient */
+  .card-wrapper:not(.active):before {
+    background: conic-gradient(
+      rgba(21, 0, 255, 0.4) 0deg,
+      rgba(96, 81, 255, 0.4) 0deg,
+      transparent 80deg
+    );
+
+    @apply absolute left-[-25%] top-[-25%] h-[150%] w-[150%] animate-border-spin content-[''];
+  }
+
+  /* Body */
+  .card-content {
+    @apply absolute p-4 left-[1px] top-[1px] h-[calc(100%-2px)] w-[calc(100%-2px)] rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900;
+  }
+  .card-wrapper.active .card-content {
+    @apply bg-gradient-to-b from-slate-950 to-slate-950 text-slate-600;
+  } 
+}
