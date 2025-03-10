@@ -1,5 +1,10 @@
 # React + Vite
 
+Version 1.0.
+
+- implemented Task functionality with CRUD operations.
+- 
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
