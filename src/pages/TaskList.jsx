@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { sortByDate } from "../util/dataManipulation";
 import Task from "../components/Task";
 import TaskForm from "../components/TaskForm";
 import Modal from "../components/UI/Modal";
@@ -32,15 +33,11 @@ export default function TaskList() {
             ...resData[key],
           });
         }
-        loadTasks.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          return dateA - dateB;
-        });
+
+        sortByDate(loadTasks);
 
         setTasks(loadTasks);
         setIsFetching(false);
-
       } catch (error) {
         setError({
           message: error.message || "There was an error while fetching data.",
@@ -53,6 +50,10 @@ export default function TaskList() {
   }, []);
 
   async function deleteTask(id) {
+    const prevTasks = [...tasks];
+    const updatedTasks = sortByDate(prevTasks.filter((task) => task.id !== id));
+    setTasks(updatedTasks);
+
     try {
       const response = await fetch(
         `https://react-redux-80deb-default-rtdb.europe-west1.firebasedatabase.app/tasks/${id}.json`,
@@ -64,17 +65,17 @@ export default function TaskList() {
       if (!response.ok) {
         throw new Error("Failed to get the data!");
       }
-
-      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
-
     } catch (error) {
       setError({
         message: error.message || "There was an error while deleting the item.",
       });
+      setTasks(prevTasks);
     }
   }
 
   async function addTask(task) {
+    const prevTasks = [...tasks];
+
     try {
       const response = await fetch(
         "https://react-redux-80deb-default-rtdb.europe-west1.firebasedatabase.app/tasks.json",
@@ -94,22 +95,25 @@ export default function TaskList() {
       const responseData = await response.json();
       const newTask = { id: responseData.name, ...task };
 
-      setTasks((prevState) =>
-        [...prevState, newTask].sort(
-          (a, b) => new Date(a.date) - new Date(b.date)
-        )
-      );
-      
+      setTasks((prevState) => sortByDate([...prevState, newTask]));
     } catch (error) {
       setError({
         message: error.message.includes("Failed to fetch")
           ? "There is an network error."
-          : message.error || "Failed to add the task.",
+          : "Failed to add the task.",
       });
+      setTasks(prevTasks);
     }
   }
 
   async function updateTask(id, task) {
+    const prevTasks = [...tasks];
+    setTasks((prevState) => {
+      return sortByDate(
+        prevState.map((item) => (item.id === id ? { ...item, ...task } : item))
+      );
+    });
+
     try {
       const response = await fetch(
         `https://react-redux-80deb-default-rtdb.europe-west1.firebasedatabase.app/tasks/${id}.json`,
@@ -125,17 +129,13 @@ export default function TaskList() {
       if (!response.ok) {
         throw new Error("Failed to update a task");
       }
-
-      setTasks((prevState) =>
-        prevState.map((item) => (item.id === id ? { ...item, ...task } : item))
-      );
-
     } catch (error) {
       setError({
         message: error.message.includes("Failed to fetch")
           ? "Network error."
           : error.message || "Failed to update a task.",
       });
+      setTasks(prevTasks);
     }
   }
 
@@ -153,19 +153,24 @@ export default function TaskList() {
   }
 
   function handleEdit(id) {
-    const taskToEdit = tasks.find((task) => task.id === id);
-    setSelectedTask(taskToEdit);
+    setSelectedTask(tasks.find((task) => task.id === id));
   }
 
   async function handleMarking(id) {
+    const prevTasks = [...tasks];
     const taskToEdit = tasks.find((task) => task.id === id);
     const editedTask = { ...taskToEdit, done: !taskToEdit.done };
-    setTasks((prevTasks) =>
-      prevTasks.map((item) =>
+    setTasks((prevState) =>
+      prevState.map((item) =>
         item.id === id ? { ...item, done: !item.done } : item
       )
     );
-    await updateTask(id, editedTask);
+
+    try {
+      await updateTask(id, editedTask);
+    } catch (error) {
+      setTasks(prevTasks);
+    }
   }
 
   return (
@@ -173,7 +178,6 @@ export default function TaskList() {
       {error && (
         <Modal open={error}>
           <p>{error?.message}</p>
-          {console.log(error.message)}
           <button
             className="btn w-24 mt-4 self-center"
             onClick={() => {
@@ -190,12 +194,13 @@ export default function TaskList() {
           <p className="pb-8">This action will permanently delete the task.</p>
           <nav className="flex justify-center gap-5">
             <button
+              type="button"
               className="btn bg-red-600 hover:bg-red-500 hover:text-slate-200"
               onClick={confirmDelete}
             >
               Confirm
             </button>
-            <button className="btn" onClick={cancelDelete}>
+            <button type="button" className="btn" onClick={cancelDelete}>
               Cancel
             </button>
           </nav>
@@ -204,9 +209,8 @@ export default function TaskList() {
       <div>
         <h2 className="text-2xl font-bold">Tasks</h2>
         <div className="task-list grid grid-cols-[repeat(auto-fit,minmax(200px,250px))] gap-3 pt-4 pb-16">
-          {error && <p>{error.message}</p>}
           {isFetching ? (
-            <p>There is no tasks at this moment..</p>
+            <p>Loading...</p>
           ) : (
             tasks.map((task) => (
               <Task

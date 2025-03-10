@@ -13,21 +13,25 @@ export default function Task({
     .toLocaleDateString("hr")
     .replace(/\s+/g, "");
 
-  const taskClass = done ? `card-wrapper aspect-square w-full ${done ? 'active' : undefined}` : "card-wrapper aspect-square w-full";
+  const taskClass = done
+    ? `card-wrapper aspect-square w-full ${done ? "active" : undefined}`
+    : "card-wrapper aspect-square w-full";
 
   return (
     <div className={taskClass}>
       <div className="card-content flex flex-col items-center justify-center text-xs">
         <h4 className=" text-xl pb-3">{name}</h4>
-        <input
-          className="mb-5"
-          type="checkbox"
-          name="mark"
-          checked={done}
-          onChange={() => {
-            onMark(id);
-          }}
-        />
+        {!selectedTask && (
+          <input
+            className="mb-5"
+            type="checkbox"
+            name="mark"
+            checked={done}
+            onChange={() => {
+              onMark(id);
+            }}
+          />
+        )}
         <p className=" pb-4 text-xs italic">Due date: {formatedDate}</p>
         <p className="text-center">{description}</p>
         <menu className="mt-5 flex gap-2">
