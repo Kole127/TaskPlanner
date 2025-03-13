@@ -7,9 +7,10 @@ DONE:
 - implemented Task functionality with CRUD operations
 - implemented formActions for adding tasks
 - implemented optimistic updating
+- create a context for managing application state
 
 NEXT TO DO:
-- create a context for managing application state
+- implement Goals feature
 
 OPTIONAL: 
 - create a custom hook for fetching data
