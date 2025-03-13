@@ -1,3 +1,6 @@
+import { Link } from "react-router";
+import { HashLink } from "react-router-hash-link";
+
 export default function Task({
   id,
   done,
@@ -37,9 +40,11 @@ export default function Task({
         <menu className="mt-5 flex gap-2">
           {!selectedTask && (
             <>
-              <button className="btn" onClick={() => onEdit(id)}>
-                Edit
-              </button>
+              <HashLink smooth to={'#form'}>
+                <button className="btn" onClick={() => onEdit(id)}>
+                  Edit
+                </button>
+              </HashLink>
               <button className="btn" onClick={() => onDelete(id)}>
                 Delete
               </button>

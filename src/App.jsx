@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import RootLayout from "./pages/Root";
 import Home from "./pages/Home";
 import TaskList from "./pages/TaskList";
+import TasksContextProvider from "./store/tasks-context";
 
 function App() {
   const router = createBrowserRouter([
@@ -23,7 +24,9 @@ function App() {
   ])
 
   return (
-    <RouterProvider router={router} />
+    <TasksContextProvider>
+      <RouterProvider router={router} />
+    </TasksContextProvider>
   );
 }
 

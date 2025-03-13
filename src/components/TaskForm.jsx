@@ -1,34 +1,40 @@
-import { startTransition, useActionState, useEffect, useRef } from "react";
+import { startTransition, useActionState, useEffect, useRef, memo } from "react";
 import { isNotEmpty } from "../util/validation";
+import { useLocation } from "react-router";
 
-export default function TaskForm({
+const initialFormState = {
+  errors: null,
+  enteredValues: {
+    name: "",
+    date: "",
+    description: "",
+  },
+};
+
+const TaskForm = memo(function TaskForm({
   selectedTask,
   setSelectedTask,
   addTask,
   updateTask,
 }) {
   const formRef = useRef();
+  const location = useLocation();
 
-  const initialFormState = {
-    errors: null,
-    enteredValues: {
-      name: '',
-      date: '',
-      description: '',
-    },
-  };
+  useEffect(() => {
+    setSelectedTask(null);
+  }, [location.pathname]);
 
   async function addTaskAction(prevFormState, formData) {
     if (formData === null) {
       return initialFormState;
     }
-  
+
     const name = formData.get("name");
     const date = formData.get("date");
     const description = formData.get("description");
-  
+
     let errors = [];
-  
+
     if (!isNotEmpty(name)) {
       errors.push("Name field is empty.");
     }
@@ -38,7 +44,7 @@ export default function TaskForm({
     if (!isNotEmpty(description)) {
       errors.push("Description is not added.");
     }
-  
+
     if (errors.length > 0) {
       return {
         errors,
@@ -49,21 +55,23 @@ export default function TaskForm({
         },
       };
     }
-  
+
     const task = { name, date, description };
-  
+
     if (selectedTask) {
       await updateTask(selectedTask.id, task);
       setSelectedTask(null);
     } else {
-      await addTask({...task, done: false});
+      await addTask({ ...task, done: false });
     }
-  
+
     return initialFormState;
   }
 
-  const [formState, formAction, pending] = useActionState(addTaskAction, initialFormState);
-
+  const [formState, formAction, pending] = useActionState(
+    addTaskAction,
+    initialFormState
+  );
 
   const handleCancelEdit = () => {
     formRef.current.reset();
@@ -75,7 +83,6 @@ export default function TaskForm({
     formRef.current.reset();
     startTransition(() => formAction(null));
   }, [selectedTask]);
-  
 
   return (
     <div className="new-task">
@@ -83,7 +90,7 @@ export default function TaskForm({
         <h2 className="text-2xl font-bold mb-5">Enter new task</h2>
       )}
       {selectedTask && <h2 className="text-2xl font-bold mb-5">Edit task</h2>}
-      <form action={formAction} className="max-w-xl grid gap-4" ref={formRef}>
+      <form action={formAction} className="max-w-xl grid gap-4" ref={formRef} id="form">
         <p>
           <label htmlFor="name">Name</label>
           <input
@@ -91,9 +98,7 @@ export default function TaskForm({
             name="name"
             id="name"
             defaultValue={
-              selectedTask?.name ||
-              formState.enteredValues?.name ||
-              ""
+              selectedTask?.name || formState.enteredValues?.name || ""
             }
           />
         </p>
@@ -104,9 +109,7 @@ export default function TaskForm({
             name="date"
             id="date"
             defaultValue={
-              selectedTask?.date ||
-              formState.enteredValues?.date ||
-              ""
+              selectedTask?.date || formState.enteredValues?.date || ""
             }
           />
         </p>
@@ -144,9 +147,7 @@ export default function TaskForm({
               >
                 Cancel
               </button>
-              <button className="btn">
-                Save
-              </button>
+              <button className="btn">Save</button>
             </>
           )}
           {selectedTask && pending && (
@@ -158,4 +159,6 @@ export default function TaskForm({
       </form>
     </div>
   );
-}
+});
+
+export default TaskForm;

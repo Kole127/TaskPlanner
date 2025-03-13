@@ -1,143 +1,25 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { sortByDate } from "../util/dataManipulation";
 import Task from "../components/Task";
 import TaskForm from "../components/TaskForm";
-import Modal from "../components/UI/Modal";
+import Modal from "../UI/Modal";
+import { TasksContext } from "../store/tasks-context";
 
 export default function TaskList() {
-  const [tasks, setTasks] = useState([]);
-  const [isFetching, setIsFetching] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [deletingTask, setDeletingTask] = useState(null);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    async function fetchData() {
-      setIsFetching(true);
-
-      try {
-        const response = await fetch(
-          "https://react-redux-80deb-default-rtdb.europe-west1.firebasedatabase.app/tasks.json"
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to get the data!");
-        }
-
-        const resData = await response.json();
-        const loadTasks = [];
-
-        for (const key in resData) {
-          loadTasks.push({
-            id: key,
-            ...resData[key],
-          });
-        }
-
-        sortByDate(loadTasks);
-
-        setTasks(loadTasks);
-        setIsFetching(false);
-      } catch (error) {
-        setError({
-          message: error.message || "There was an error while fetching data.",
-        });
-        setIsFetching(false);
-      }
-    }
-
-    fetchData();
-  }, []);
-
-  async function deleteTask(id) {
-    const prevTasks = [...tasks];
-    const updatedTasks = sortByDate(prevTasks.filter((task) => task.id !== id));
-    setTasks(updatedTasks);
-
-    try {
-      const response = await fetch(
-        `https://react-redux-80deb-default-rtdb.europe-west1.firebasedatabase.app/tasks/${id}.json`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to get the data!");
-      }
-    } catch (error) {
-      setError({
-        message: error.message || "There was an error while deleting the item.",
-      });
-      setTasks(prevTasks);
-    }
-  }
-
-  async function addTask(task) {
-    const prevTasks = [...tasks];
-
-    try {
-      const response = await fetch(
-        "https://react-redux-80deb-default-rtdb.europe-west1.firebasedatabase.app/tasks.json",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(task),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to add task!");
-      }
-
-      const responseData = await response.json();
-      const newTask = { id: responseData.name, ...task };
-
-      setTasks((prevState) => sortByDate([...prevState, newTask]));
-    } catch (error) {
-      setError({
-        message: error.message.includes("Failed to fetch")
-          ? "There is an network error."
-          : "Failed to add the task.",
-      });
-      setTasks(prevTasks);
-    }
-  }
-
-  async function updateTask(id, task) {
-    const prevTasks = [...tasks];
-    setTasks((prevState) => {
-      return sortByDate(
-        prevState.map((item) => (item.id === id ? { ...item, ...task } : item))
-      );
-    });
-
-    try {
-      const response = await fetch(
-        `https://react-redux-80deb-default-rtdb.europe-west1.firebasedatabase.app/tasks/${id}.json`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify(task),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to update a task");
-      }
-    } catch (error) {
-      setError({
-        message: error.message.includes("Failed to fetch")
-          ? "Network error."
-          : error.message || "Failed to update a task.",
-      });
-      setTasks(prevTasks);
-    }
-  }
+  const {
+    tasks,
+    setTasks,
+    error,
+    setError,
+    isFetching,
+    selectedTask,
+    setSelectedTask,
+    deletingTask,
+    setDeletingTask,
+    deleteTask,
+    addTask,
+    updateTask
+  } = useContext(TasksContext);
 
   function handleDelete(id) {
     setDeletingTask(id);
