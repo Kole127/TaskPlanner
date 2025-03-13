@@ -1,6 +1,6 @@
 # TaskPlanner
 
-Version 1.0.
+Version 0.2
 
 DONE:
 - created first UI version for application with Home and Tasks as pages in the menu
