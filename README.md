@@ -8,3 +8,4 @@ A React-based task management app featuring CRUD operations, optimistic updates,
 - Added form actions for adding new tasks
 - Implemented optimistic updates for smoother user interaction
 - Set up Context API for managing global application state
+- Integrated Firebase Realtime Database for fetching and managing tasks
