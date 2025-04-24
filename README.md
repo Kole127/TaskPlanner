@@ -1,16 +1,10 @@
 # TaskPlanner
 
-Version 0.2
+A React-based task management app featuring CRUD operations, optimistic updates, and global state management using Context API.
 
-DONE:
-- created first UI version for application with Home and Tasks as pages in the menu
-- implemented Task functionality with CRUD operations
-- implemented formActions for adding tasks
-- implemented optimistic updating
-- create a context for managing application state
-
-NEXT TO DO:
-- implement Goals feature
-
-OPTIONAL: 
-- create a custom hook for fetching data
+## Version 0.2
+- Created the initial UI with Home and Tasks pages in the navigation menu
+- Implemented task functionality with full CRUD operations
+- Added form actions for adding new tasks
+- Implemented optimistic updates for smoother user interaction
+- Set up Context API for managing global application state
