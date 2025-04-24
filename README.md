@@ -9,3 +9,4 @@ A React-based task management app featuring CRUD operations, optimistic updates,
 - Implemented optimistic updates for smoother user interaction
 - Set up Context API for managing global application state
 - Integrated Firebase Realtime Database for fetching and managing tasks
+- Styled the application using Tailwind CSS, including reusable Tailwind components
